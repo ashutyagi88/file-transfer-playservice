@@ -3,10 +3,20 @@ data "aws_vpc" "default" {
   default = true
 }
 
+# Zones that can run Fargate tasks. In this account us-east-1e (zone ID use1-az3) cannot.
+data "aws_availability_zones" "fargate" {
+  state            = "available"
+  exclude_zone_ids = ["use1-az3"]
+}
+
 data "aws_subnets" "default" {
   filter {
     name   = "vpc-id"
     values = [data.aws_vpc.default.id]
+  }
+  filter {
+    name   = "availability-zone"
+    values = data.aws_availability_zones.fargate.names
   }
 }
 
